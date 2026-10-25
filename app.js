@@ -17,7 +17,7 @@ const start = fromHash() || HOME;
 
 const map = new mapboxgl.Map({
   container: "map", style: "mapbox://styles/mapbox/light-v11",
-  center: [start.lng, start.lat], zoom: 16, bearing: 29, // avenues run up the page
+  center: [start.lng, start.lat], zoom: EMBED ? 15.7 : 16, bearing: 29, // avenues run up the page
   minZoom: 9.5, maxBounds: [[-74.6, 40.35], [-73.4, 41.1]], attributionControl: true,
   cooperativeGestures: EMBED, // two fingers to pan, so the page still scrolls
 });
@@ -161,7 +161,7 @@ map.on("style.load", async () => {
 
 $("home").addEventListener("click", e => {
   e.preventDefault();
-  map.flyTo({ center: [HOME.lng, HOME.lat], zoom: 16, bearing: 29 });
+  map.flyTo({ center: [HOME.lng, HOME.lat], zoom: EMBED ? 15.7 : 16, bearing: 29 });
   select(HOME.lng, HOME.lat, HOME.name);
 });
 
