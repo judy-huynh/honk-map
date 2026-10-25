@@ -28,7 +28,13 @@ function pad() {
   const r = document.querySelector(".panel").getBoundingClientRect();
   map.setPadding(innerWidth <= 640 || EMBED ? { top: 0, right: 0, left: 0, bottom: r.height } : { top: 0, right: 0, bottom: 0, left: r.right });
 }
-pad(); map.jumpTo({ center: [start.lng, start.lat] });
+// In the blog embed, sit the corner up and to the right so the Lincoln Tunnel ramps show below it
+function homeView() {
+  const box = map.getContainer().getBoundingClientRect(), p = map.getPadding();
+  const W = box.width - p.left - p.right, H = box.height - p.top - p.bottom;
+  return { center: [HOME.lng, HOME.lat], zoom: EMBED ? 15.7 : 16, bearing: 29, offset: EMBED ? [0.14 * W, -0.24 * H] : [0, 0] };
+}
+pad(); map.jumpTo(start === HOME ? homeView() : { center: [start.lng, start.lat] });
 addEventListener("resize", pad);
 
 // Repaint the light basemap in the site palette
@@ -161,7 +167,7 @@ map.on("style.load", async () => {
 
 $("home").addEventListener("click", e => {
   e.preventDefault();
-  map.flyTo({ center: [HOME.lng, HOME.lat], zoom: EMBED ? 15.7 : 16, bearing: 29 });
+  map.flyTo(homeView());
   select(HOME.lng, HOME.lat, HOME.name);
 });
 
