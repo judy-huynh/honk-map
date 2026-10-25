@@ -5,6 +5,8 @@ const C = { paper: "#F5F2E8", paper2: "#E9E5D8", ink: "#201E1A", soft: "#6B665C"
 const HOME = { lng: -73.998313, lat: 40.76083, name: "11th Ave and W 42nd St" };
 const R = 100; // meters
 const $ = id => document.getElementById(id);
+const EMBED = new URLSearchParams(location.search).has("embed"); // compact version for the blog post
+document.body.classList.toggle("embed", EMBED);
 
 // Start where the hash says, else 11th and 42nd
 const fromHash = () => {
@@ -17,13 +19,14 @@ const map = new mapboxgl.Map({
   container: "map", style: "mapbox://styles/mapbox/light-v11",
   center: [start.lng, start.lat], zoom: 16, bearing: 29, // avenues run up the page
   minZoom: 9.5, maxBounds: [[-74.6, 40.35], [-73.4, 41.1]], attributionControl: true,
+  cooperativeGestures: EMBED, // two fingers to pan, so the page still scrolls
 });
 map.addControl(new mapboxgl.NavigationControl({ visualizePitch: false }), "top-right");
 
 // Keep the selected spot clear of the panel (left on desktop, bottom on phones)
 function pad() {
   const r = document.querySelector(".panel").getBoundingClientRect();
-  map.setPadding(innerWidth <= 640 ? { top: 0, right: 0, left: 0, bottom: r.height } : { top: 0, right: 0, bottom: 0, left: r.right });
+  map.setPadding(innerWidth <= 640 || EMBED ? { top: 0, right: 0, left: 0, bottom: r.height } : { top: 0, right: 0, bottom: 0, left: r.right });
 }
 pad(); map.jumpTo({ center: [start.lng, start.lat] });
 addEventListener("resize", pad);
@@ -83,6 +86,7 @@ function select(lng, lat, name) {
     $("years").textContent = "";
   }
   const h = `#${lat.toFixed(5)},${lng.toFixed(5)}`;
+  $("full").href = "./" + (name === HOME.name ? "" : h);
   if (name === HOME.name) history.replaceState(null, "", location.pathname);
   else if (location.hash !== h) history.replaceState(null, "", h);
 }
@@ -106,6 +110,7 @@ function camIcon() {
 }
 
 const dataP = fetch("data/honks.json").then(r => r.json());
+const tunnelsP = fetch("data/tunnels.geojson").then(r => r.json());
 
 map.on("style.load", async () => {
   brand();
@@ -121,6 +126,13 @@ map.on("style.load", async () => {
     properties: { a: c[0], b: c[1], ev: c[2], sm: c[3] } })) } });
   map.addImage("cam", camIcon(), { pixelRatio: 2 });
 
+  // Blue is reserved for tunnels and the ramps that feed them
+  map.addSource("tunnels", { type: "geojson", data: await tunnelsP });
+  const tw = ["interpolate", ["linear"], ["zoom"], 11, 1.5, 16, 4];
+  map.addLayer({ id: "tunnel-bores", type: "line", source: "tunnels", filter: ["==", ["get", "k"], "bore"],
+    paint: { "line-color": C.blue, "line-opacity": 0.55, "line-width": tw, "line-dasharray": [2, 2] } });
+  map.addLayer({ id: "tunnel-ramps", type: "line", source: "tunnels", filter: ["==", ["get", "k"], "ramp"],
+    layout: { "line-cap": "round" }, paint: { "line-color": C.blue, "line-opacity": 0.55, "line-width": tw } });
   map.addLayer({ id: "ring-fill", type: "fill", source: "ring", paint: { "fill-color": C.pink, "fill-opacity": 0.06 } });
   map.addLayer({ id: "honks", type: "circle", source: "honks", paint: {
     "circle-color": C.pink, "circle-opacity": 0.8,
@@ -142,7 +154,8 @@ map.on("style.load", async () => {
     const p = e.features[0].properties;
     showTip(e, `<b>DEP noise camera</b><br>${p.a}, ${p.b}<br>${fmt(p.ev)} loud vehicles logged in 2025`);
   });
-  for (const l of ["honks", "cams"]) map.on("mouseleave", l, () => { hideTip(); map.getCanvas().style.cursor = ""; });
+  for (const l of ["tunnel-bores", "tunnel-ramps"]) map.on("mousemove", l, e => showTip(e, `<b>${e.features[0].properties.n}</b>`));
+  for (const l of ["honks", "cams", "tunnel-bores", "tunnel-ramps"]) map.on("mouseleave", l, () => { hideTip(); map.getCanvas().style.cursor = ""; });
   map.on("click", e => { hideTip(); select(e.lngLat.lng, e.lngLat.lat); });
 });
 

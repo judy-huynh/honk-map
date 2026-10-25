@@ -1,4 +1,5 @@
-"""Build data/honks.json: 311 Car/Truck Horn complaints since 2024, grouped by location, plus hotspot scores and DEP cameras."""
+"""Build data/honks.json (311 Car/Truck Horn complaints since 2024 by location, hotspot scores, DEP cameras)
+and data/tunnels.geojson (vehicle tunnels and their ramps, from NYC Street Centerline)."""
 import json, math, collections, urllib.request, urllib.parse, datetime, os
 
 OUT = os.path.join(os.path.dirname(__file__), "..", "data", "honks.json")
@@ -67,3 +68,15 @@ out = {"asof": asof, "years": years, "count": len(rows),
        "cams": [[a, b, ev, sm] + geocode(a, b) for a, b, ev, sm in CAMS]}
 json.dump(out, open(OUT, "w"), separators=(",", ":"))
 print(f"{len(rows)} complaints, {len(pts)} locations, {len(hot)} hotspots, as of {asof}")
+
+# Tunnels (rw_type 4) and the ramps that feed them (rw_type 9), drawn in blue on the map
+CL = "https://data.cityofnewyork.us/resource/inkn-q76z.json"
+RAMPS = "(upper(full_street_name) like '%TUNNEL%' OR upper(full_street_name) like '%TUNL%' OR upper(full_street_name) like 'PORT AUTHORITY BUS%' OR upper(full_street_name) like 'PATH BUS TRML%')"
+feats = []
+for kind, where in [("bore", "rw_type='4' AND full_street_name NOT LIKE 'PEDESTRIAN%'"), ("ramp", f"rw_type='9' AND {RAMPS}")]:
+    q = urllib.parse.urlencode({"$select": "the_geom,full_street_name", "$where": where, "$limit": 5000})
+    for r in get(f"{CL}?{q}"):
+        g = r["the_geom"]; g["coordinates"] = [[[round(x, 6), round(y, 6)] for x, y in line] for line in g["coordinates"]]
+        feats.append({"type": "Feature", "geometry": g, "properties": {"k": kind, "n": r["full_street_name"].title()}})
+json.dump({"type": "FeatureCollection", "features": feats}, open(os.path.join(os.path.dirname(OUT), "tunnels.geojson"), "w"), separators=(",", ":"))
+print(f"{len(feats)} tunnel and ramp segments")

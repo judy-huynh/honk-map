@@ -11,6 +11,10 @@ Story: [12 Noise Cameras, 25 Promised, 1 Very Loud Corner](https://judyhuynh.ca/
 - Cameras: DEP, [2025 Annual Report for Noise Camera Enforcement Program](https://www.nyc.gov/assets/dep/downloads/pdf/air/noise/2025-annual-report-noise-camera-enforcement-program.pdf), geocoded with NYC Planning Labs GeoSearch.
 - Ranking: complaints within 100 m of every location, overlapping circles merged into one hotspot (keeping the busiest). A tapped spot's rank is how many hotspots have more complaints, plus one. Circles instead of a fixed grid, so a grid line can't split one cluster in two.
 
-Refresh: `python3 scripts/build_data.py` rewrites `data/honks.json`.
+- Tunnels: NYC Street Centerline, tunnels (rw_type 4) and the ramps that feed them (rw_type 9). Blue on the map means tunnels only.
+
+Embed: add `?embed` for the compact version used in the blog post (two-finger pan, panel docked at the bottom).
+
+Refresh: `python3 scripts/build_data.py` rewrites `data/honks.json` and `data/tunnels.geojson`.
 
 311 counts measure who calls, not how loud a street is.

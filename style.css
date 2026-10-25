@@ -36,6 +36,7 @@ h1 { font-size: 1.9rem; line-height: 1; margin: 0 0 .4rem; font-weight: 800; let
 .key i { display: inline-block; vertical-align: -2px; margin-right: .4rem; }
 .k-dot { width: 13px; height: 13px; border-radius: 50%; background: var(--pink); }
 .k-cam { width: 13px; height: 13px; border: 3px solid var(--ink); background: var(--paper); }
+.k-tun { width: 22px; height: 4px; background: var(--blue); opacity: .55; }
 .k-ring { width: 14px; height: 14px; border-radius: 50%; border: 2px dashed var(--ink); }
 
 footer { border-top: 2px solid var(--ink); padding-top: .7rem; }
@@ -57,3 +58,15 @@ footer > a { display: inline-block; margin-right: 1rem; font-weight: 700; color:
   .key { margin: .7rem 0 .6rem; }
   #results { top: auto; bottom: 100%; border-top: 2px solid var(--ink); border-bottom: 0; }
 }
+
+#full { display: none; }
+
+/* Embedded in the blog post: panel docks along the bottom, story and source links move to the post */
+body.embed .panel { top: auto; bottom: 0; left: 0; right: 0; width: auto; max-height: none; border-width: 2px 0 0; padding: 12px 14px 10px; }
+body.embed h1, body.embed .lede, body.embed .src, body.embed footer > a:first-child { display: none; }
+body.embed #full { display: inline-block; }
+body.embed .search { margin-bottom: .6rem; }
+body.embed #count { font-size: 2.4rem; }
+body.embed .key { margin: .5rem 0 .5rem; }
+body.embed footer { padding-top: .5rem; }
+body.embed #results { top: auto; bottom: 100%; border-top: 2px solid var(--ink); border-bottom: 0; }
