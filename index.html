@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Honk Map: 311 Horn Complaints in NYC</title>
+<meta name="description" content="Every 311 car horn complaint in New York City since 2024. Tap any corner to count the honks within 100 meters and see how it ranks citywide.">
+<meta property="og:title" content="Honk Map">
+<meta property="og:description" content="Tap any NYC corner to count the 311 horn complaints within 100 meters and see how it ranks.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css" rel="stylesheet">
+<link href="style.css" rel="stylesheet">
+</head>
+<body>
+<div id="map" aria-label="Map of 311 car horn complaints in New York City"></div>
+
+<aside class="panel">
+  <header>
+    <h1>Honk Map</h1>
+    <p class="lede">311 car horn complaints since January 2024. Tap anywhere to count the honks within 100 meters.</p>
+  </header>
+
+  <div class="search">
+    <input id="q" type="search" placeholder="Search an address or intersection" autocomplete="off" aria-label="Search an address or intersection">
+    <ul id="results" role="listbox" hidden></ul>
+  </div>
+
+  <section class="stats" aria-live="polite">
+    <p class="place" id="place">11th Ave and W 42nd St</p>
+    <p class="big"><span id="count">…</span><span class="unit">horn complaints within 100 m</span></p>
+    <p class="rank" id="rank"></p>
+    <p class="years" id="years"></p>
+  </section>
+
+  <div class="key">
+    <span><i class="k-dot"></i>311 horn complaints</span>
+    <span><i class="k-cam"></i>DEP noise camera</span>
+    <span><i class="k-ring"></i>100 m circle</span>
+  </div>
+
+  <footer>
+    <a href="https://judyhuynh.ca/honking-11th-ave-42nd-st-nyc-noise-cameras/">Read the story</a>
+    <a href="#" id="home">Back to 11th and 42nd</a>
+    <p class="src">Data: <a href="https://data.cityofnewyork.us/Social-Services/311-Service-Requests-from-2010-to-Present/erm2-nwe9">NYC Open Data 311</a>, <a href="https://www.nyc.gov/assets/dep/downloads/pdf/air/noise/2025-annual-report-noise-camera-enforcement-program.pdf">DEP 2025 noise camera report</a>. Complaints through <span id="asof"></span>.</p>
+  </footer>
+</aside>
+
+<div class="tip" id="tip" hidden></div>
+
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
